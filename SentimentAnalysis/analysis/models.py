@@ -1,7 +1,8 @@
 from django.db import models
+from SentimentAnalysis.models import BaseModel
 
 
-class Company(models.Model):
+class Company(BaseModel):
     company_id = models.AutoField(primary_key=True)
     company_name = models.CharField(max_length=255)
 
@@ -12,7 +13,7 @@ class Company(models.Model):
         db_table = "company"
 
 
-class KeywordSummary(models.Model):
+class KeywordSummary(BaseModel):
     keyword_id = models.AutoField(primary_key=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     keyword = models.CharField(max_length=255)
@@ -26,7 +27,7 @@ class KeywordSummary(models.Model):
         db_table = "keyword_summary"
 
 
-class Review(models.Model):
+class Review(BaseModel):
     REVIEW_SENTIMENTS = (
         (-1, 'Negative'),
         (0, 'Neutral'),
@@ -47,7 +48,7 @@ class Review(models.Model):
         db_table = "review"
 
 
-class Summary(models.Model):
+class Summary(BaseModel):
     summary_id = models.AutoField(primary_key=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     summary_text = models.TextField()
