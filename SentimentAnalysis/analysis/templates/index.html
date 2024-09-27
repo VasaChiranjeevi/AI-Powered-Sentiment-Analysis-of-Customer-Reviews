@@ -89,7 +89,12 @@
 
             // Fetch the reviews and summary via AJAX
             fetch(`/get-reviews/${companyId}/`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Network response was not ok " + response.statusText);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     // Update the summary
                     document.getElementById("summaryText").innerText = data.summary;
@@ -111,6 +116,13 @@
                     } else {
                         oldReviewsDiv.innerHTML = '<p>No reviews available for this company.</p>';
                     }
+                })
+                .catch(error => {
+                    // Handle any errors that occurred during the fetch request
+                    console.error("There was a problem with the fetch operation:", error);
+                    document.getElementById("summaryText").innerText = "An error occurred while fetching the summary.";
+                    const oldReviewsDiv = document.getElementById("oldReviews");
+                    oldReviewsDiv.innerHTML = '<p>Failed to load reviews. Please try again later.</p>';
                 });
         }
 
