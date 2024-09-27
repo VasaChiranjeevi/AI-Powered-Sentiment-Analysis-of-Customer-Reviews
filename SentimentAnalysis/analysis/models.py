@@ -1,5 +1,5 @@
 from django.db import models
-# from SentimentAnalysis.SentimentAnalysis.constants import REVIEW_SENTIMENTS
+from SentimentAnalysis.SentimentAnalysis.constants import REVIEW_SENTIMENTS
 
 
 class Company(models.Model):
@@ -28,11 +28,6 @@ class KeywordSummary(models.Model):
 
 
 class Review(models.Model):
-    REVIEW_SENTIMENTS = (
-        (-1, 'Negative'),
-        (0, 'Neutral'),
-        (1, 'Positive')
-    )
 
     review_id = models.AutoField(primary_key=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
