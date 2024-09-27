@@ -17,7 +17,7 @@ def index(request):
 def get_reviews(request, company_id):
     try:
         # Ensure that the company exists
-        company = get_object_or_404(Company, pk=company_id)
+        company = get_object_or_404(Company,pk=company_id)
         reviews = Review.objects.filter(company_id=company_id).order_by('-date_created')[:2]
         summary = Summary.objects.filter(company_id=company_id).first()
 
