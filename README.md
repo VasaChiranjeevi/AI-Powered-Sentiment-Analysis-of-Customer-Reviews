@@ -160,7 +160,3 @@ The objective of this project is to build an AI-powered system to collect and an
      ```
 
 ---
-
-#### 8. **Conclusion**
-
-This project outlines a quick, efficient system to handle the collection, storage, and analysis of customer reviews using AI models. It is designed to be implemented in 4 to 6 hours, using available free AI models for sentiment analysis. The documentation provides clear use cases and steps to achieve the project’s goals.
