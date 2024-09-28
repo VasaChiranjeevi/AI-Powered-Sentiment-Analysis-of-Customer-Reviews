@@ -1,10 +1,11 @@
-
 from django.http import JsonResponse
 import json
-
 from .Apiconnect import generate_response
-from .models import Summary, KeywordSummary
-from .constant import Summary_prompt
+from dashboard.models import KeywordSummary, Summary
+from Utility.constant import Summary_prompt
+
+import logging
+logger = logging.getLogger(__name__)
 
 
 def generate_summary_prompt(reviews):
@@ -66,7 +67,7 @@ def response_formater(reviews,company):
                     )
 
             return summary
+
     except Exception as e:
-        print(f'An exception happend while retreving response from AI {e}')
-        return JsonResponse({'error': 'An error occurred while fetching the response.'}, status=500)
-                    
+        logger.info(f"Error occurred while response format: {e}")
+        raise e

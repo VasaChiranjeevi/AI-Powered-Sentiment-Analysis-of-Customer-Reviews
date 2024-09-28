@@ -1,10 +1,10 @@
 from dotenv import load_dotenv
 import google.generativeai as genai
 import os
+from Utility.constant import SentimentConstants
 
 import logging
 
-from .constant import MAX_ATTEMPTS
 
 logger = logging.getLogger(__name__)
 # Load environment variables from the .env file
@@ -13,9 +13,10 @@ load_dotenv()
 
  
 def generate_response(prompt):
+    try:
         """Generates a text response using the LLM based on the provided prompt"""
         attempts = 0
-        max_retry = MAX_ATTEMPTS
+        max_retry = SentimentConstants.MAX_ATTEMPTS
         while attempts < max_retry:
             try:
                 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -38,3 +39,7 @@ def generate_response(prompt):
                 logger.error(f"Error occurred during generate_response on attempt {attempts + 1}: {e}")
                 attempts += 1
         raise Exception(f"Failed to generate a valid response after {max_retry} attempts")
+
+    except Exception as e:
+        logger.info(f"Error occurred while generating response: {e}")
+        raise e

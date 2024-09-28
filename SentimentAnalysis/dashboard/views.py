@@ -1,21 +1,20 @@
+from django.http import HttpResponseBadRequest
+
+from SentimentAnalysis.constants import POSITIVE, NEGATIVE, NEUTRAL
+from Utility.Apiconnect import generate_response
+from Utility.formater import generate_summary_prompt
+from dashboard.models import Company, Review, Summary, KeywordSummary
 import json
 from datetime import datetime
-
-from django.http import JsonResponse, HttpResponseBadRequest
-from django.shortcuts import render, get_object_or_404
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from .constant import POSITIVE, NEGATIVE, NEUTRAL
-from .models import Company, Review, Summary,KeywordSummary
-from .Apiconnect import generate_response
-from .formater import generate_summary_prompt,response_formater
-from .sentiment_analyzer import SentimentAnalyser
+from dashboard.service import DashboardService
+from review_analysis.service import ReviewAnalysisService
+from sentiment_scan.service import SentimentScanService
 from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import get_object_or_404, render
 
+
+# Create your views here.
 def index(request):
     try:
         companies = Company.objects.all()
@@ -24,7 +23,6 @@ def index(request):
         # Log the error and return a 500 internal server error
         print(f"Error in index view: {e}")
         return HttpResponseBadRequest("An error occurred while loading the companies.")
-
 
 def get_reviews(request, company_id,renderpage=False):
     try:
@@ -107,12 +105,6 @@ def get_reviews(request, company_id,renderpage=False):
         return JsonResponse({'error': 'An error occurred while fetching the reviews.'}, status=500)
 
 
-
-class AnalyseReviews(APIView):
-    def post(self, request):
-        return Response({"success": "Analyze Review"}, status=status.HTTP_200_OK)
-
-
 class SubmitResponse(View):
     def post(self, request):
         try:
@@ -125,20 +117,12 @@ class SubmitResponse(View):
             company = get_object_or_404(Company, pk=data['company_id'])
             date_created = datetime.now()
             company_id = data['company_id']
-            sentiment_label = SentimentAnalyser().get_sentiment(data['review_text'])
 
-            # Create the new review
-            Review.objects.create(
-                company=company,
-                customer_name=data['customer_name'],
-                date_created=date_created,
-                review_text=data['review_text'],
-                sentiment=sentiment_label
-            )
+            sentiment_label = SentimentScanService().get_sentiment(data['review_text'])
 
-            # Update summary
-            reviews = Review.objects.filter(company=company)
-            response_formater(reviews, company)
+            reviews = DashboardService().get_all_reviews_by_company(company, data, date_created, sentiment_label)
+
+            summary = ReviewAnalysisService().extractSummarizeReviewsByCustomer(company, reviews)
 
             # Render the index.html template with the updated context
             context = get_reviews(request, company_id)
@@ -152,4 +136,3 @@ class SubmitResponse(View):
             # Log the error and return an appropriate error message
             print(f"Error in submit_review view: {e}")
             return JsonResponse({'error': 'An error occurred while submitting the review.'}, status=500)
-
