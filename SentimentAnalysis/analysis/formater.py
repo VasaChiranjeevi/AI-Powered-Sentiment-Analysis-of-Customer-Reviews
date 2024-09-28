@@ -5,6 +5,8 @@ import json
 from .Apiconnect import generate_response
 from .models import Summary, KeywordSummary
 from .constant import Summary_prompt
+import logging
+logger = logging.getLogger(__name__)
 
 
 def generate_summary_prompt(reviews):
@@ -35,7 +37,7 @@ def response_formater(reviews,company):
             try:
                 responces_dict = json.loads(responces_cleaned)
             except json.JSONDecodeError as e:
-                print(f"Failed to decode JSON: {e}")
+                logger.error(f"Failed to decode JSON: {e}")
                 return JsonResponse({'error': 'Invalid JSON format.'}, status=400)
 
             # Extract summary and keywords from the cleaned response
@@ -67,6 +69,6 @@ def response_formater(reviews,company):
 
             return summary
     except Exception as e:
-        print(f'An exception happend while retreving response from AI {e}')
+        logger.error(f'An exception happend while retreving response from AI {e}')
         return JsonResponse({'error': 'An error occurred while fetching the response.'}, status=500)
                     

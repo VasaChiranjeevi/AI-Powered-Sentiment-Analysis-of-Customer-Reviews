@@ -15,6 +15,8 @@ from .sentiment_analyzer import SentimentAnalyser
 from django.http import JsonResponse
 from django.views import View
 from django.shortcuts import get_object_or_404, render
+import logging
+logger = logging.getLogger(__name__)
 
 def index(request):
     try:
@@ -22,7 +24,7 @@ def index(request):
         return render(request, 'index.html', {'companies': companies})
     except Exception as e:
         # Log the error and return a 500 internal server error
-        print(f"Error in index view: {e}")
+        logger.error(f"Error in index view: {e}")
         return HttpResponseBadRequest("An error occurred while loading the companies.")
 
 
@@ -35,8 +37,6 @@ def get_reviews(request, company_id,renderpage=False):
         postive_count = Review.objects.filter(company_id=company_id,sentiment=POSITIVE).count()
         negative_count = Review.objects.filter(company_id=company_id, sentiment=NEGATIVE).count()
         neutral_count = Review.objects.filter(company_id=company_id, sentiment=NEUTRAL).count()
-
-
 
         review_data = [
             {
@@ -51,7 +51,7 @@ def get_reviews(request, company_id,renderpage=False):
             responces = generate_response(generate_summary_prompt(review_data))
 
             # Print for debugging
-            print(f"Generated responces: {responces}")
+            logger.info(f"Generated responces: {responces}")
 
             # Use a regular expression to extract only the valid JSON part
             json_start = responces.find('{')  # Find the position of the first curly brace
@@ -103,7 +103,7 @@ def get_reviews(request, company_id,renderpage=False):
         return JsonResponse({'error': 'Failed to parse JSON response.'}, status=400)
     except Exception as e:
         # Log the error and return an appropriate message
-        print(f"Error in get_reviews view: {e}")
+        logger.error(f"Error in get_reviews view: {e}")
         return JsonResponse({'error': 'An error occurred while fetching the reviews.'}, status=500)
 
 
@@ -150,6 +150,6 @@ class SubmitResponse(View):
             return JsonResponse({'error': 'Invalid JSON data.'}, status=400)
         except Exception as e:
             # Log the error and return an appropriate error message
-            print(f"Error in submit_review view: {e}")
+            logger.error(f"Error in submit_review view: {e}")
             return JsonResponse({'error': 'An error occurred while submitting the review.'}, status=500)
 
