@@ -9,6 +9,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('auth/', include('rest_framework.urls')),
     path('analyse-reviews', views.AnalyseReviews.as_view(), name='analyse-reviews'),
-    path('analyse-sentiment', views.AnalyseSentiment.as_view(), name='analyse-sentiment'),
+    path('submit-response/', views.SubmitResponse.as_view(), name='submit-response'),
 
 ]

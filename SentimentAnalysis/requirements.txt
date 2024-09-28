@@ -3,3 +3,6 @@ mysqlclient
 python-dotenv
 django-safedelete
 mysql-client
+djangorestframework
+transformers
+torch
