@@ -30,6 +30,18 @@
         .mb-4, .mb-3 {
             margin-bottom: 1rem;
         }
+        .display-number {
+            font-size: 5rem; /* Adjust this value based on the desired size */
+            line-height: 1; /* Ensures the number doesn't have extra spacing */
+        }
+        .small-text {
+            font-size: 1rem; /* Small text size */
+        }
+        @media (max-width: 768px) {
+            .display-number {
+                font-size: 3rem; /* Make it smaller for mobile screens */
+            }
+        }
     </style>
 </head>
 <body>
@@ -38,7 +50,6 @@
             <!-- Left side: Form for submitting reviews -->
             <div class="col-md-6">
                 <h2 class="mb-4">Submit Your Review</h2>
-
                 <!-- Company Dropdown -->
                 <div class="mb-3">
                     <label for="companySelect" class="form-label">Select Company</label>
@@ -72,6 +83,24 @@
                 <h3>Overall Review <span style="font-size: 12px;">(AI-generated)</span></h3>
                 <div id="aiSummary" class="border p-3 bg-light mb-4">
                     <p id="summaryText">Select a company to view the summary.</p>
+                </div>
+
+                <!-- Sentiment Counts -->
+                <div class="row">
+                    <div class="d-flex justify-content-around mb-3">
+                        <div class="text-center col-md-4">
+                            <h3 id="positiveCount" class="display-number">0</h3>
+                            <p class="small-text">Positive</p>
+                        </div>
+                        <div class="text-center col-md-4">
+                            <h1 id="neutralCount" class="display-number">0</h1>
+                            <p class="small-text">Neutral</p>
+                        </div>
+                        <div class="text-center col-md-4">
+                            <h2 id="negativeCount" class="display-number">0</h2>
+                            <p class="small-text">Negative</p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Previous Reviews Section -->
@@ -120,6 +149,10 @@
                             `;
                             oldReviewsDiv.innerHTML += reviewElement;
                         });
+
+                        document.getElementById("positiveCount").innerText = data.positive;
+                        document.getElementById("negativeCount").innerText = data.negative;
+                        document.getElementById("neutralCount").innerText = data.neutral;
                     } else {
                         oldReviewsDiv.innerHTML = '<p>No reviews available for this company.</p>';
                     }
@@ -128,8 +161,7 @@
                     // Handle any errors that occurred during the fetch request
                     console.error("There was a problem with the fetch operation:", error);
                     document.getElementById("summaryText").innerText = "An error occurred while fetching the summary.";
-                    const oldReviewsDiv = document.getElementById("oldReviews");
-                    oldReviewsDiv.innerHTML = '<p>Failed to load reviews. Please try again later.</p>';
+                    document.getElementById("oldReviews").innerHTML = '<p>Failed to load reviews. Please try again later.</p>';
                 });
         }
 
@@ -160,10 +192,14 @@
             .then(response => response.json())
             .then(data => {
                 alert("Review submitted successfully!");
-                
+
                 // Reset the dropdown to the selected company to show the latest review and summary
                 populateReviews();
 
+            // Clear the form after submission
+            document.getElementById("customerName").value = '';
+            document.getElementById("reviewText").value = '';
+            document.getElementById("companySelect").selectedIndex = companyId;
                 // Reset form fields
                 document.getElementById("customerName").value = '';
                 document.getElementById("reviewText").value = '';

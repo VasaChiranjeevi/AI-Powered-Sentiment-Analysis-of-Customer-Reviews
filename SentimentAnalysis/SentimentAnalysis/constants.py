@@ -1,5 +1,5 @@
-REVIEW_SENTIMENTS = (
-        (-1, 'Negative'),
-        (0, 'Neutral'),
-        (1, 'Positive')
-    )
+# constants.py
+POSITIVE =1
+NEGATIVE = -1
+NEUTRAL = 0
+

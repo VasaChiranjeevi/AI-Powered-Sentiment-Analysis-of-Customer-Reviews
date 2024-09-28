@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .constant import POSITIVE, NEGATIVE, NEUTRAL
 from .models import Company, Review, Summary,KeywordSummary
 from .Apiconnect import generate_response
 from .formater import generate_summary_prompt,response_formater
@@ -31,12 +32,17 @@ def get_reviews(request, company_id,renderpage=False):
         company = get_object_or_404(Company,pk=company_id)
         reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')
         summary = Summary.objects.filter(company_id=company_id).latest('summary_id')
+        postive_count = Review.objects.filter(company_id=company_id,sentiment=POSITIVE).count()
+        negative_count = Review.objects.filter(company_id=company_id, sentiment=NEGATIVE).count()
+        neutral_count = Review.objects.filter(company_id=company_id, sentiment=NEUTRAL).count()
+
+
 
         review_data = [
             {
                 'customer_name': review.customer_name,
                 'review_text': review.review_text,
-                'date_created': review.date_created.strftime("%Y-%m-%d")
+                'date_created': review.date_created.strftime("%Y-%m-%d"),
             } for review in reviews[:2]
         ]
 
@@ -86,9 +92,11 @@ def get_reviews(request, company_id,renderpage=False):
 
         return JsonResponse({
             'reviews': review_data,
-            'summary': summary.summary_text,  # Return the saved summary
+            'summary': summary.summary_text,
+            'positive': postive_count,
+            'negative': negative_count,
+            'neutral': neutral_count
         })
-            
     except Company.DoesNotExist:
         return JsonResponse({'error': 'Company not found.'}, status=404)
     except json.JSONDecodeError:
@@ -144,3 +152,4 @@ class SubmitResponse(View):
             # Log the error and return an appropriate error message
             print(f"Error in submit_review view: {e}")
             return JsonResponse({'error': 'An error occurred while submitting the review.'}, status=500)
+
