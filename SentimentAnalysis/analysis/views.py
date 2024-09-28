@@ -132,14 +132,4 @@ class SubmitResponse(APIView):
             # Log the error and return an appropriate error message
             print(f"Error in submit_review view: {e}")
             return JsonResponse({'error': 'An error occurred while submitting the review.'}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=405)
 
-class AnalyseReviews(APIView):
-    def post(self, request):
-        return Response({"success": "Analyze Review"}, status=status.HTTP_200_OK)
-
-
-class AnalyseSentiment(APIView):
-    def post(self, request):
-        return Response({"success": "Analyze Sentiment"}, status=status.HTTP_200_OK)
