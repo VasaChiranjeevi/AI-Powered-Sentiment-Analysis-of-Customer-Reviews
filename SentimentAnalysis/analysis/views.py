@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
@@ -22,7 +24,7 @@ def get_reviews(request, company_id):
     try:
         # Ensure that the company exists
         company = get_object_or_404(Company,pk=company_id)
-        reviews = Review.objects.filter(company_id=company_id).order_by('-date_created')[:2]
+        reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')[:2]
         summary = Summary.objects.filter(company_id=company_id).first()
 
         review_data = [
@@ -55,14 +57,17 @@ def submit_review(request):
                 return JsonResponse({'error': 'Invalid data. Company ID, customer name, and review text are required.'},
                                     status=400)
 
-            company = get_object_or_404(Company, id=data['company_id'])
+            company = get_object_or_404(Company, pk=data['company_id'])
+            date_created = datetime.now()
+            company_id = data['company_id']
 
             # Create the new review
             Review.objects.create(
                 company=company,
                 customer_name=data['customer_name'],
+                date_created=date_created,
                 review_text=data['review_text'],
-                sentiment=0  # Default sentiment
+                sentiment=0
             )
             return JsonResponse({'message': 'Review submitted successfully!'})
         except Company.DoesNotExist:
