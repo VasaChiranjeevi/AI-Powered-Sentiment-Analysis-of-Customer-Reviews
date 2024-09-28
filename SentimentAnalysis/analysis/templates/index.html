@@ -88,13 +88,6 @@
         function populateReviews() {
             const companyId = document.getElementById("companySelect").value;
 
-            console.log(companyId);
-
-            if (isNaN(companyId) || companyId.trim() === "") {
-                console.error("Invalid company ID.");
-                return;
-            }
-
             // Fetch the reviews and summary via AJAX
             fetch(`/get-reviews/${companyId}/`)
                 .then(response => {
@@ -115,7 +108,10 @@
                         data.reviews.forEach(review => {
                             const reviewElement = `
                                 <div class="border p-3 mb-3">
-                                    <p><strong>${review.customer_name}</strong> (Reviewed on ${review.date_created})</p>
+                                    <p>
+                                        <strong>${review.customer_name}</strong> 
+                                        (Reviewed on ${review.date_created}) - <span class="text-muted">Sentiment: ${review.sentiment}</span>
+                                    </p>
                                     <p>${review.review_text}</p>
                                 </div>
                             `;

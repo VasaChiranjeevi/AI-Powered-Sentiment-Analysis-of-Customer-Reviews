@@ -29,10 +29,12 @@ def get_reviews(request, company_id):
         reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')
         summary = Summary.objects.filter(company_id=company_id).first()
         allkeywords=[]
+        sentiment_dict = dict(Review.REVIEW_SENTIMENTS)
         review_data = [
             {
                 'customer_name': review.customer_name,
                 'review_text': review.review_text,
+                'sentiment': sentiment_dict.get(review.sentiment, 'Unknown'),
                 'date_created': review.date_created.strftime("%Y-%m-%d")
             } for review in reviews[:2]
         ]
@@ -81,7 +83,8 @@ def get_reviews(request, company_id):
         return JsonResponse({
             'reviews': review_data,
             'summary': summary.summary_text,  # Return the saved summary
-            'keywords': allkeywords
+            'keywords': allkeywords,
+            
         })
     except Company.DoesNotExist:
         return JsonResponse({'error': 'Company not found.'}, status=404)
