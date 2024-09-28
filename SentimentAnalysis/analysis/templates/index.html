@@ -87,6 +87,13 @@
         function populateReviews() {
             const companyId = document.getElementById("companySelect").value;
 
+            console.log(companyId);
+
+            if (isNaN(companyId) || companyId.trim() === "") {
+                console.error("Invalid company ID.");
+                return;
+            }
+
             // Fetch the reviews and summary via AJAX
             fetch(`/get-reviews/${companyId}/`)
                 .then(response => {
@@ -142,7 +149,7 @@
                 review_text: reviewText
             };
 
-            fetch(`/submit-review/`, {
+            fetch(`/api/submit-response/`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

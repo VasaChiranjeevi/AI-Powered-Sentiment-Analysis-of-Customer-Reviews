@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from rest_framework import status
@@ -6,6 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Company, Review, Summary
+from .sentiment_analyzer import SentimentAnalyser
 
 
 def index(request):
@@ -22,7 +25,7 @@ def get_reviews(request, company_id):
     try:
         # Ensure that the company exists
         company = get_object_or_404(Company,pk=company_id)
-        reviews = Review.objects.filter(company_id=company_id).order_by('-date_created')[:2]
+        reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')[:2]
         summary = Summary.objects.filter(company_id=company_id).first()
 
         review_data = [
@@ -45,8 +48,14 @@ def get_reviews(request, company_id):
         return JsonResponse({'error': 'An error occurred while fetching the reviews.'}, status=500)
 
 
-def submit_review(request):
-    if request.method == "POST":
+
+class AnalyseReviews(APIView):
+    def post(self, request):
+        return Response({"success": "Analyze Review"}, status=status.HTTP_200_OK)
+
+
+class SubmitResponse(APIView):
+    def post(self, request):
         try:
             data = json.loads(request.body)
 
@@ -55,16 +64,21 @@ def submit_review(request):
                 return JsonResponse({'error': 'Invalid data. Company ID, customer name, and review text are required.'},
                                     status=400)
 
-            company = get_object_or_404(Company, id=data['company_id'])
+            company = get_object_or_404(Company, pk=data['company_id'])
+            date_created = datetime.now()
+            company_id = data['company_id']
+            sentiment_label = SentimentAnalyser().get_sentiment(data['review_text'])
 
             # Create the new review
             Review.objects.create(
                 company=company,
                 customer_name=data['customer_name'],
+                date_created=date_created,
                 review_text=data['review_text'],
-                sentiment=0  # Default sentiment
+                sentiment=sentiment_label
             )
-            return JsonResponse({'message': 'Review submitted successfully!'})
+            JsonResponse({'message': 'Review submitted successfully!'})
+            return get_reviews(request, company_id)
         except Company.DoesNotExist:
             return JsonResponse({'error': 'Company not found.'}, status=404)
         except json.JSONDecodeError:
@@ -73,14 +87,3 @@ def submit_review(request):
             # Log the error and return an appropriate error message
             print(f"Error in submit_review view: {e}")
             return JsonResponse({'error': 'An error occurred while submitting the review.'}, status=500)
-    else:
-        return JsonResponse({'error': 'Invalid request method.'}, status=405)
-
-class AnalyseReviews(APIView):
-    def post(self, request):
-        return Response({"success": "Analyze Review"}, status=status.HTTP_200_OK)
-
-
-class AnalyseSentiment(APIView):
-    def post(self, request):
-        return Response({"success": "Analyze Sentiment"}, status=status.HTTP_200_OK)
