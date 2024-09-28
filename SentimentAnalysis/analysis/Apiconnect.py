@@ -1,10 +1,11 @@
-import requests
-import os
 from dotenv import load_dotenv
 import google.generativeai as genai
 import os
-from  Utils.constant import MAX_ATTEMPTS
+
 import logging
+
+from .constant import MAX_ATTEMPTS
+
 logger = logging.getLogger(__name__)
 # Load environment variables from the .env file
 load_dotenv()

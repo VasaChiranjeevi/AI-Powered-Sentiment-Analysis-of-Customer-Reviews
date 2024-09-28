@@ -1,9 +1,11 @@
-from Utils.constant import Summary_prompt
-import re
-from Utils.Apiconnect import generate_response
-from django.http import JsonResponse, HttpResponseBadRequest
+
+from django.http import JsonResponse
 import json
-from analysis.models import Company, Review, Summary,KeywordSummary
+
+from .Apiconnect import generate_response
+from .models import Summary, KeywordSummary
+from .constant import Summary_prompt
+
 
 def generate_summary_prompt(reviews):
     review_data_formatted = ''.join([
