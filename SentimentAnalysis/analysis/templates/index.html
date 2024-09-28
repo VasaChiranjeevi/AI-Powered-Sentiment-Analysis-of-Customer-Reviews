@@ -160,12 +160,18 @@
             .then(response => response.json())
             .then(data => {
                 alert("Review submitted successfully!");
+                
+                // Reset the dropdown to the selected company to show the latest review and summary
                 populateReviews();
-            });
 
-            document.getElementById("customerName").value = '';
-            document.getElementById("reviewText").value = '';
-            document.getElementById("companySelect").selectedIndex = 0;
+                // Reset form fields
+                document.getElementById("customerName").value = '';
+                document.getElementById("reviewText").value = '';
+            })
+            .catch(error => {
+                console.error("Error submitting review:", error);
+                alert("An error occurred while submitting the review.");
+            });
         }
     </script>
 </body>
