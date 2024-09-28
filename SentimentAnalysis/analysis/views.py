@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Company, Review, Summary,KeywordSummary
-from Utils.Apiconnect import generate_response
-from Utils.formater import generate_summary_prompt,response_formater
+from .Apiconnect import generate_response
+from .formater import generate_summary_prompt,response_formater
 from .sentiment_analyzer import SentimentAnalyser
 
 def index(request):
@@ -27,7 +27,7 @@ def get_reviews(request, company_id):
         # Ensure that the company exists
         company = get_object_or_404(Company,pk=company_id)
         reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')
-        summary = Summary.objects.filter(company_id=company_id).first()
+        summary = Summary.objects.filter(company_id=company_id).latest('summary_id')
 
         review_data = [
             {
