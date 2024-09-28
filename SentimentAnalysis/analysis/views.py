@@ -1,6 +1,10 @@
 import json
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 from .models import Company, Review, Summary
 
 
@@ -71,3 +75,12 @@ def submit_review(request):
             return JsonResponse({'error': 'An error occurred while submitting the review.'}, status=500)
     else:
         return JsonResponse({'error': 'Invalid request method.'}, status=405)
+
+class AnalyseReviews(APIView):
+    def post(self, request):
+        return Response({"success": "Analyze Review"}, status=status.HTTP_200_OK)
+
+
+class AnalyseSentiment(APIView):
+    def post(self, request):
+        return Response({"success": "Analyze Sentiment"}, status=status.HTTP_200_OK)
