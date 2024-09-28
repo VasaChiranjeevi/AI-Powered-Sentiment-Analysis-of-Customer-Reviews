@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .constant import POSITIVE, NEGATIVE, NEUTRAL
 from .models import Company, Review, Summary,KeywordSummary
 from .Apiconnect import generate_response
 from .formater import generate_summary_prompt,response_formater
@@ -31,9 +32,9 @@ def get_reviews(request, company_id,renderpage=False):
         company = get_object_or_404(Company,pk=company_id)
         reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')
         summary = Summary.objects.filter(company_id=company_id).latest('summary_id')
-        postive_count = Review.objects.filter(company_id=company_id,sentiment=1).count()
-        negative_count = Review.objects.filter(company_id=company_id, sentiment=-1).count()
-        neutral_count = Review.objects.filter(company_id=company_id, sentiment=0).count()
+        postive_count = Review.objects.filter(company_id=company_id,sentiment=POSITIVE).count()
+        negative_count = Review.objects.filter(company_id=company_id, sentiment=NEGATIVE).count()
+        neutral_count = Review.objects.filter(company_id=company_id, sentiment=NEUTRAL).count()
 
 
 
