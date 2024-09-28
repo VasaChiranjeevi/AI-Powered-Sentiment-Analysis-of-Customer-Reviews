@@ -1,6 +1,8 @@
 from datetime import datetime
 from django.db import models
 
+# from ..SentimentAnalysis.constants import REVIEW_SENTIMENTS
+
 
 class Company(models.Model):
     company_id = models.AutoField(primary_key=True)

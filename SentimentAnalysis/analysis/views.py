@@ -12,6 +12,7 @@ from Utils.Apiconnect import generate_response
 from Utils.formater import generate_summary_prompt,response_formater
 from .sentiment_analyzer import SentimentAnalyser
 
+
 def index(request):
     try:
         companies = Company.objects.all()
@@ -24,16 +25,23 @@ def index(request):
 
 def get_reviews(request, company_id):
     try:
+        positive_count =0
+        negative_count = 0
+        neutral_count=0
         # Ensure that the company exists
         company = get_object_or_404(Company,pk=company_id)
         reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')
         summary = Summary.objects.filter(company_id=company_id).first()
+        postive_count = Review.objects.filter(company_id=company_id,sentiment=1).count()
+        negative_count = Review.objects.filter(company_id=company_id, sentiment=-1).count()
+        neutral_count = Review.objects.filter(company_id=company_id, sentiment=0).count()
+
 
         review_data = [
             {
                 'customer_name': review.customer_name,
                 'review_text': review.review_text,
-                'date_created': review.date_created.strftime("%Y-%m-%d")
+                'date_created': review.date_created.strftime("%Y-%m-%d"),
             } for review in reviews[:2]
         ]
 
@@ -78,7 +86,10 @@ def get_reviews(request, company_id):
 
         return JsonResponse({
             'reviews': review_data,
-            'summary': summary.summary_text,  # Return the saved summary
+            'summary': summary.summary_text,
+            'positive': postive_count,
+            'negative': negative_count,
+            'neutral': neutral_count
         })
     except Company.DoesNotExist:
         return JsonResponse({'error': 'Company not found.'}, status=404)
