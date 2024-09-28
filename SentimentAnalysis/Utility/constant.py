@@ -1,8 +1,9 @@
-MAX_ATTEMPTS = 2
-POSITIVE = 1
-NEGATIVE = -1
-NEUTRAL = 0
 
+class SentimentConstants:
+    MAX_ATTEMPTS = 2
+    POSITIVE = 1
+    NEGATIVE = -1
+    NEUTRAL = 0
 
 Summary_prompt = '''"You are an AI that specializes in analyzing product reviews and identifying key insights. I will provide you with a set of customer reviews. Your task is to :
 

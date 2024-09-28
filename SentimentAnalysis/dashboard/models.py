@@ -1,7 +1,6 @@
 from datetime import datetime
-from django.db import models
 
-# from ..SentimentAnalysis.constants import REVIEW_SENTIMENTS
+from django.db import models
 
 
 class Company(models.Model):
