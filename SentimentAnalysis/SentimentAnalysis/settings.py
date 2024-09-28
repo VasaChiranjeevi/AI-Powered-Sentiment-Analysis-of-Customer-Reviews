@@ -114,9 +114,9 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': os.getenv('LOG_LEVEL', 'INFO'),
             'class': 'logging.FileHandler',
-            'filename': 'app.log',
+            'filename': os.getenv('LOG_FILE', 'app.log'),
         },
     },
     'loggers': {
