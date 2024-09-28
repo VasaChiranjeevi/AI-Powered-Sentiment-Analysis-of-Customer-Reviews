@@ -1,8 +1,8 @@
+from datetime import datetime
 from django.db import models
-from SentimentAnalysis.models import BaseModel
 
 
-class Company(BaseModel):
+class Company(models.Model):
     company_id = models.AutoField(primary_key=True)
     company_name = models.CharField(max_length=255)
 
@@ -13,7 +13,7 @@ class Company(BaseModel):
         db_table = "company"
 
 
-class KeywordSummary(BaseModel):
+class KeywordSummary(models.Model):
     keyword_id = models.AutoField(primary_key=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     keyword = models.CharField(max_length=255)
@@ -27,7 +27,7 @@ class KeywordSummary(BaseModel):
         db_table = "keyword_summary"
 
 
-class Review(BaseModel):
+class Review(models.Model):
     REVIEW_SENTIMENTS = (
         (-1, 'Negative'),
         (0, 'Neutral'),
@@ -38,7 +38,7 @@ class Review(BaseModel):
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     customer_name = models.CharField(max_length=255)
     review_text = models.TextField()
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(default=datetime.now())
     sentiment = models.IntegerField(choices=REVIEW_SENTIMENTS)
 
     def __str__(self):
@@ -48,7 +48,7 @@ class Review(BaseModel):
         db_table = "review"
 
 
-class Summary(BaseModel):
+class Summary(models.Model):
     summary_id = models.AutoField(primary_key=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
     summary_text = models.TextField()
