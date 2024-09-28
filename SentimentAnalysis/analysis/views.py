@@ -8,10 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Company, Review, Summary,KeywordSummary
-from Utils.Apiconnect import generate_response
-from Utils.formater import generate_summary_prompt,response_formater
+from .Apiconnect import generate_response
+from .formater import generate_summary_prompt,response_formater
 from .sentiment_analyzer import SentimentAnalyser
-
+from django.http import JsonResponse
+from django.views import View
+from django.shortcuts import get_object_or_404, render
 
 def index(request):
     try:
@@ -23,18 +25,16 @@ def index(request):
         return HttpResponseBadRequest("An error occurred while loading the companies.")
 
 
-def get_reviews(request, company_id):
+def get_reviews(request, company_id,renderpage=False):
     try:
-        positive_count =0
-        negative_count = 0
-        neutral_count=0
         # Ensure that the company exists
         company = get_object_or_404(Company,pk=company_id)
         reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')
-        summary = Summary.objects.filter(company_id=company_id).first()
+        summary = Summary.objects.filter(company_id=company_id).latest('summary_id')
         postive_count = Review.objects.filter(company_id=company_id,sentiment=1).count()
         negative_count = Review.objects.filter(company_id=company_id, sentiment=-1).count()
         neutral_count = Review.objects.filter(company_id=company_id, sentiment=0).count()
+
 
 
         review_data = [
@@ -83,6 +83,11 @@ def get_reviews(request, company_id):
                     keyword=keyword,
                     keyword_summary=keyword_summary
                 )
+        if renderpage:
+            return {
+            'reviews': review_data,
+            'summary': summary.summary_text,  # Return the saved summary
+        }
 
         return JsonResponse({
             'reviews': review_data,
@@ -107,15 +112,14 @@ class AnalyseReviews(APIView):
         return Response({"success": "Analyze Review"}, status=status.HTTP_200_OK)
 
 
-class SubmitResponse(APIView):
+class SubmitResponse(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
 
             # Validate the required fields
             if 'company_id' not in data or 'customer_name' not in data or 'review_text' not in data:
-                return JsonResponse({'error': 'Invalid data. Company ID, customer name, and review text are required.'},
-                                    status=400)
+                return JsonResponse({'error': 'Invalid data. Company ID, customer name, and review text are required.'}, status=400)
 
             company = get_object_or_404(Company, pk=data['company_id'])
             date_created = datetime.now()
@@ -130,11 +134,15 @@ class SubmitResponse(APIView):
                 review_text=data['review_text'],
                 sentiment=sentiment_label
             )
-            #update summary
+
+            # Update summary
             reviews = Review.objects.filter(company=company)
-            response_formater(reviews,company)
-            JsonResponse({'message': 'Review submitted successfully!'})
-            return get_reviews(request, company_id)
+            response_formater(reviews, company)
+
+            # Render the index.html template with the updated context
+            context = get_reviews(request, company_id)
+            return render(request, 'index.html', context)
+
         except Company.DoesNotExist:
             return JsonResponse({'error': 'Company not found.'}, status=404)
         except json.JSONDecodeError:

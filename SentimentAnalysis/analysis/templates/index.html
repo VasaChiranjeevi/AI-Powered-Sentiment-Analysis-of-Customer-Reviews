@@ -55,6 +55,7 @@
                     <label for="companySelect" class="form-label">Select Company</label>
                     <select class="form-select" id="companySelect" onchange="populateReviews()">
                         <option selected disabled>Choose a company</option>
+                        <!-- Dynamically populate companies -->
                         {% for company in companies %}
                             <option value="{{ company.company_id }}">{{ company.company_name }}</option>
                         {% endfor %}
@@ -157,6 +158,7 @@
                     }
                 })
                 .catch(error => {
+                    // Handle any errors that occurred during the fetch request
                     console.error("There was a problem with the fetch operation:", error);
                     document.getElementById("summaryText").innerText = "An error occurred while fetching the summary.";
                     document.getElementById("oldReviews").innerHTML = '<p>Failed to load reviews. Please try again later.</p>';
@@ -188,15 +190,24 @@
                 body: JSON.stringify(reviewData)
             })
             .then(response => response.json())
-            .then(() => {
+            .then(data => {
                 alert("Review submitted successfully!");
+
+                // Reset the dropdown to the selected company to show the latest review and summary
                 populateReviews();
-            });
 
             // Clear the form after submission
             document.getElementById("customerName").value = '';
             document.getElementById("reviewText").value = '';
             document.getElementById("companySelect").selectedIndex = 0;
+                // Reset form fields
+                document.getElementById("customerName").value = '';
+                document.getElementById("reviewText").value = '';
+            })
+            .catch(error => {
+                console.error("Error submitting review:", error);
+                alert("An error occurred while submitting the review.");
+            });
         }
     </script>
 </body>
