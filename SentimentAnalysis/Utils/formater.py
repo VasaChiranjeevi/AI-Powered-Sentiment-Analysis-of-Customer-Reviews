@@ -11,7 +11,7 @@ def generate_summary_prompt(reviews):
         for review in reviews
  
     ])
-    
+    print(review_data_formatted)
     return f"{Summary_prompt}\nThe reviews are:\n{{\n{review_data_formatted}\n}}"+"Please generate the response in JSON format. start from { and Avoid using special characters"
 
 def response_formater(reviews,company):

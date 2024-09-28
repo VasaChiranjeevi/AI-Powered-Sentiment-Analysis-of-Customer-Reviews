@@ -28,7 +28,7 @@ def get_reviews(request, company_id):
         company = get_object_or_404(Company,pk=company_id)
         reviews = Review.objects.filter(company_id=company_id).order_by('-review_id')
         summary = Summary.objects.filter(company_id=company_id).first()
-
+        allkeywords=[]
         review_data = [
             {
                 'customer_name': review.customer_name,
@@ -75,10 +75,13 @@ def get_reviews(request, company_id):
                     keyword=keyword,
                     keyword_summary=keyword_summary
                 )
-
+                allkeywords.append(keyword)
+        else:
+             allkeywords = list(KeywordSummary.objects.filter(company=company).values_list('keyword', flat=True))[:5]
         return JsonResponse({
             'reviews': review_data,
             'summary': summary.summary_text,  # Return the saved summary
+            'keywords': allkeywords
         })
     except Company.DoesNotExist:
         return JsonResponse({'error': 'Company not found.'}, status=404)

@@ -72,6 +72,7 @@
                 <h3>Overall Review <span style="font-size: 12px;">(AI-generated)</span></h3>
                 <div id="aiSummary" class="border p-3 bg-light mb-4">
                     <p id="summaryText">Select a company to view the summary.</p>
+                    <p><strong>Keywords:</strong> <span id="keywordsText">No keywords available.</span></p>
                 </div>
 
                 <!-- Previous Reviews Section -->
@@ -123,6 +124,11 @@
                     } else {
                         oldReviewsDiv.innerHTML = '<p>No reviews available for this company.</p>';
                     }
+
+                    // Update keywords section
+                    const keywords = data.keywords;
+                    const keywordsText = keywords.length > 0 ? keywords.join(', ') : 'No keywords available';
+                    document.getElementById("keywordsText").innerText = keywordsText;
                 })
                 .catch(error => {
                     // Handle any errors that occurred during the fetch request
